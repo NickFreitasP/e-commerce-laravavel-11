@@ -328,6 +328,8 @@
       </div>
 
       <div class="border-top mt-auto pb-2">
+
+        {{-- @guest --}}
         <div class="customer-links container mt-4 mb-2 pb-1">
           <svg class="d-inline-block align-middle" width="20" height="20" viewBox="0 0 20 20" fill="none"
             xmlns="http://www.w3.org/2000/svg">
@@ -335,6 +337,7 @@
           </svg>
           <span class="d-inline-block ms-2 text-uppercase align-middle fw-medium">My Account</span>
         </div>
+        {{-- @endguest --}}
 
 
 
@@ -398,7 +401,7 @@
         <nav class="navigation">
           <ul class="navigation__list list-unstyled d-flex">
             <li class="navigation__item">
-              <a href="index.html" class="navigation__link">Home</a>
+              <a href="{{route("home")}}" class="navigation__link">Home</a>
             </li>
             <li class="navigation__item">
               <a href="shop.html" class="navigation__link">Shop</a>
@@ -462,15 +465,27 @@
             </div>
           </div>
 
+          @guest
           <div class="header-tools__item hover-container">
-            <a href="login.html" class="header-tools__item">
+            <a href="{{route("login")}}" class="header-tools__item">
               <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
                 xmlns="http://www.w3.org/2000/svg">
                 <use href="#icon_user" />
               </svg>
             </a>
           </div>
+         @else
+            <div class="header-tools__item hover-container  mt-3">
+                <a href="{{Auth::user()->type === 'adm' ? route('admin.index') : route('user.index')}}" class="header-tools__item">
 
+                <svg class="d-block mx-2" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <use href="#icon_user" />
+                </svg>
+                <p class="">{{Auth::user()->name}}</p>
+               </a>
+            </div>
+          @endguest
           <a href="wishlist.html" class="header-tools__item">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <use href="#icon_heart" />
