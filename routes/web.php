@@ -22,7 +22,8 @@ Route::controller(ShopController::class)->group(function(){
 });
 
 Route::controller(WishListController::class)->group(function(){
-    Route::post("/wishlist/add","addToWishList")->name("add-wish-list");
+   Route::get("/wishlist","index")->name("wishlist");
+   Route::post("/wishlist/add","addToWishList")->name("add-wish-list");
 
 
 
