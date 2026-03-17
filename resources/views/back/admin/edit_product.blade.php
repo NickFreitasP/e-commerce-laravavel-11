@@ -31,12 +31,12 @@
                                     </ul>
                                 </div>
                                 <!-- form-add-product -->
-                                <form class="tf-section-2 form-add-product" method="POST" enctype="multipart/form-data"
-                                    action="{{route("admin.add-product-handler")}}">
+                                <form class="tf-section-2 form-edit-product" method="POST" enctype="multipart/form-data"
+                                    action="{{route("admin.edit-product-handler")}}">
                                     @csrf
                                     <div class="wg-box">
                                         <fieldset class="name">
-                                            <div class="body-title mb-10">Product name <span class="tf-color-1">*</span>
+                                            <div class="body-title mb-10">TESTE DO KRL <span class="tf-color-1">*</span>
                                             </div>
                                             <input class="mb-10" type="text" placeholder="Enter product name"
                                                 name="name" tabindex="0" value="{{old("name",$product->name)}}" aria-required="true" required="">
@@ -128,34 +128,6 @@
                                             </div>
                                         </fieldset>
 
-                                        <fieldset>
-                                            <div class="body-title mb-10">Upload Gallery Images</div>
-                                            <div class="upload-image mb-16">
-                                              @php
-                                                  $array_images = explode(',', $product->images);
-                                              @endphp
-
-                                                @foreach ( $array_images as $image_src )
-                                                 <div class="item">
-                                                    <img src="{{asset('uploads/products/'.$image_src)}}"
-                                                    alt="{{$product->name}}">
-                                                 </div>
-                                                @endforeach
-
-
-                                                <div id="galUpload" class="item up-load">
-                                                    <label class="uploadfile" for="gFile">
-                                                        <span class="icon">
-                                                            <i class="icon-upload-cloud"></i>
-                                                        </span>
-                                                        <span class="text-tiny">Drop your images here or select <span
-                                                                class="tf-color">click to browse</span></span>
-                                                        <input type="file" id="gFile" name="images[]" accept="image/*"
-                                                            multiple="">
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </fieldset>
 
                                         <div class="cols gap22">
                                             <fieldset class="name">
@@ -225,8 +197,9 @@
                                                 </div>
                                             </fieldset>
                                         </div>
+                                        <input type="hidden" value="{{$product->id}}" name="id" >
                                         <div class="cols gap10">
-                                            <button class="tf-button w-full" type="submit">Add product</button>
+                                            <button class="tf-button w-full" type="submit">Edit product</button>
                                         </div>
                                     </div>
                                 </form>

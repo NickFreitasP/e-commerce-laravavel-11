@@ -12,6 +12,10 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Categorie;
 use App\Models\Product;
+use App\Models\productImage;
+
+use function PHPUnit\Framework\fileExists;
+
 class AdminController extends Controller
 {
 
@@ -39,12 +43,16 @@ class AdminController extends Controller
         $brand = new brands();
         $brand->name = $request->name;
         $brand->slug = Str::slug($request->name);
+
+       if($request->hasFile("image")){
         $file_extension = $request->file("image")->extension();
         $image_name = Carbon::now()->timestamp.".".$file_extension;
         $destination = public_path("uploads/brands");
         $image = $request->file("image");
         $this->generationThumbNailsImage($image,$image_name,$destination);
         $brand->image = $image_name;
+       }
+
         $brand->save();
        return redirect()->route("admin.brands")->with('status',"Brand has ben added succesfully");
     }
@@ -157,13 +165,15 @@ class AdminController extends Controller
         $categorie->name = $request->name;
 
         $categorie->slug = Str::slug($request->name);
-        $file_extension = $request->file("image")->extension();
-        $image_name = Carbon::now()->timestamp.".".$file_extension;
-        $destination = public_path("uploads/categories");
-        $image = $request->file("image");
-        $this->generationThumbNailsImage($image,$image_name,$destination);
+        if($request->hasFile("image")){
+            $file_extension = $request->file("image")->extension();
+            $image_name = Carbon::now()->timestamp.".".$file_extension;
+            $destination = public_path("uploads/categories");
+            $image = $request->file("image");
+            $this->generationThumbNailsImage($image,$image_name,$destination);
 
-        $categorie->image = $image_name;
+            $categorie->image = $image_name;
+        }
         $categorie->save();
 
         return redirect()->route("admin.categories")->with('status',"Category has ben added succesfully");
@@ -273,33 +283,6 @@ class AdminController extends Controller
          $product->image = $image_name;
 
         }
-        $array_images = [];
-        $images_db = '';
-        $counter = 1;
-
-        if($request->hasFile("images")){
-
-            $permited_extensions = ["jpg","jpeg","png","webp"];
-
-            $images = $request->file("images");
-
-            foreach ( $images as $image) {
-
-                $extension = $image->getClientOriginalExtension();
-                $gcheck = in_array($extension,$permited_extensions);
-                if($gcheck){
-
-                    $image_name = $current_timestamp."-".$counter.".".$extension;
-                    $this->generateProductThubNailsImage($image,$image_name);
-                    array_push($array_images,$image_name);
-                    $counter += 1;
-                }
-            }
-
-            $images_db = implode(",",$array_images);
-        }
-
-        $product->images = $images_db;
         $product->save();
 
         return redirect()->route("admin.products")->with("status","Product has ben added successfully");
@@ -400,5 +383,202 @@ class AdminController extends Controller
 
 
     }
+
+    public function editProductHandler(Request $request){
+
+        $this->validateInputProduct($request,"products");
+
+        $product = Product::findOrFail($request->id);
+
+        $product->name = $request->name;
+        $product->slug = Str::slug($request->name);
+        $product->short_description = $request->short_description;
+        $product->description = $request->description;
+        $product->regular_price = $request->regular_price;
+        $product->sale_price = $request->sale_price;
+        $product->SKU = $request->SKU;
+        $product->stock_status = $request->stock_status;
+        $product->featured = $request->featured;
+        $product->quantity = $request->quantity;
+        $product->category_id = $request->category_id;
+        $product->brand_id = $request->brand_id;
+
+        if($request->hasFile("image")){
+
+            if(File::exists(public_path("uploads/products/".$product->image))){
+                File::delete(public_path("uploads/products/".$product->image));
+            }
+            if(File::exists(public_path("uploads/products/thumbnails/".$product->image))){
+                File::delete(public_path("uploads/products/thumbnails/".$product->image));
+
+            }
+              $image_extension = $request->file("image")->extension();
+              $image_name = Carbon::now()->timestamp.".".$image_extension;
+              $this->generateProductThubNailsImage($request->file("image"),$image_name);
+              $product->image = $image_name;
+        }
+
+
+        $product->save();
+        return redirect()->route("admin.products")->with("status","Produto atualizado com sucesso!");
+
+    }
+    public function productImages(int $id){
+
+        $product = Product::find($id);
+
+        $images =$product->imagesGallery;
+
+
+        $data =
+        [
+            "images" => $images,
+             "product" => $product
+        ];
+        return view("back.admin.product_images",$data);
+    }
+
+    public function productImageDelete( int $id ,Request $request){
+
+        $image = ProductImage::find($id);
+
+        if($image){
+
+            if(File::exists(public_path("uploads/products/".$image->name))){
+
+                File::delete(public_path("uploads/products/".$image->name));
+            }
+            if(File::exists(public_path("uploads/products/thumbnails/".$image->name))){
+
+                File::delete(public_path("uploads/products/thumbnails/".$image->name));
+            }
+        }
+        $image->delete();
+        return redirect()->route('admin.product-images', ['id' => $request->product_id])->with("status","Image deleted with success");
+    }
+
+    public function addProductImage(Request $request ,int $id){
+
+
+        if($request->hasFile("images")){
+
+            $current_timestamp = Carbon::now()->timestamp;
+            $array_images = [];
+            $counter = 1;
+
+
+            if($request->hasFile("images")){
+
+                $permited_extensions = ["jpg","jpeg","png","webp"];
+
+                $images = $request->file("images");
+
+                foreach ( $images as $image) {
+
+                    $extension = $image->getClientOriginalExtension();
+                    $gcheck = in_array($extension,$permited_extensions);
+                    if($gcheck){
+
+                        $image_name = $current_timestamp."-".$counter.".".$extension;
+                        $this->generateProductThubNailsImage($image,$image_name);
+                        array_push($array_images,$image_name);
+                        $counter += 1;
+                    }
+                }
+            }
+
+            // dd($array_images);
+             $rows = [];
+
+            foreach ($array_images as $image) {
+                $rows[] = [
+                    'product_id' => $id,
+                    'image' => $image,
+                ];
+            }
+
+            ProductImage::insert($rows);
+
+
+            return redirect()->route("admin.product-images",["id" => $id])->with("status","Image has ben added successfully");
+
+        }
+
+        return redirect()->route("admin.product-images",["id" => $id])->with("error-image","Nenhum arquivo encontrado");
+
+
+
+    }
+
+    public function deleteProduct(int $id){
+
+        $product = Product::find($id);
+
+        if($product){
+            $images = $product->imagesGallery;
+            $principal_image = $product->image;
+
+            if($principal_image){
+               if(File::exists(public_path("uploads/products/".$principal_image))){
+                    File::delete(public_path("uploads/products/".$principal_image));
+                }
+                 if(File::exists(public_path("uploads/products/thumbnails/".$principal_image))){
+                    File::delete(public_path("uploads/products/thumbnails/".$principal_image));
+                }
+            }
+
+            if(count($images) > 0 ){
+                foreach($images as $image){
+                if(File::exists(public_path("uploads/products/".$image->image))){
+                    File::delete(public_path("uploads/products/".$image->image));
+                }
+                 if(File::exists(public_path("uploads/products/thumbnails/".$image->image))){
+                    File::delete(public_path("uploads/products/thumbnails/".$image->image));
+                }
+            }
+            }
+
+            $product->delete();
+            return redirect()->route("admin.products")->with("status","Product has ben deleted successfully");
+
+        }else{
+            return redirect()->route("admin.products")->with("error","Product not find");
+        }
+    }
+
+
+    public function addProductPrincipalImage(Request $request,int $id){
+
+        $request->validate(
+            [
+                "image" => "required|image|mimes:jpg,jpeg,png,webp||max:2048"
+            ]
+        );
+
+        $product = Product::find($id);
+        $old_image = $product->image;
+
+        if($request->hasFile("image")){
+
+            if(File::exists(public_path("uploads/products/".$old_image))){
+                File::delete(public_path("uploads/products/".$old_image));
+            }
+            if(File::exists(public_path("uploads/products/thumbnails/".$old_image))){
+                File::delete(public_path("uploads/products/thumbnails/".$old_image));
+            }
+
+
+            $image_extension = $request->file("image")->extension();
+            $image_name = Carbon::now()->timestamp.".".$image_extension;
+            $image = $request->file("image");
+            $this->generateProductThubNailsImage($image,$image_name);
+            $product->image = $image_name;
+            $product->save();
+            return redirect()->route("admin.product-images",["id"=>$product->id])->with("status","Imagem atualizada com sucesso");
+        }
+
+        return redirect()->route("admin.product-images",["id"=>$product->id])->with("error","Não foi possível fazer upload da imagem.");
+    }
+
 
 }
