@@ -7,7 +7,7 @@ use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ShopController;
-
+use App\Http\Controllers\WishListController;
 
 Auth::routes();
 
@@ -20,6 +20,14 @@ Route::controller(ShopController::class)->group(function(){
 
     Route::get("/shop/{slug}","shopDetails")->name("shop_details");
 });
+
+Route::controller(WishListController::class)->group(function(){
+    Route::post("/wishlist/add","addToWishList")->name("add-wish-list");
+
+
+
+});
+
 
 Route::controller(CartController::class)->group(function(){
 

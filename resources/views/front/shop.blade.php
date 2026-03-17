@@ -1,5 +1,14 @@
  @extends("layouts.app")
  @section("content")
+ <style>
+  .filled-heart{
+    color: red;
+    background: red;
+}
+
+</style>
+
+
  <main class="pt-90">
     <section class="shop-main container d-flex pt-4 pt-xl-5">
       <div class="shop-sidebar side-sticky bg-body" id="shopFilter">
@@ -408,13 +417,27 @@
                   <span class="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span>
                 </div>
 
-                <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist"
-                  title="Add To Wishlist">
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <use href="#icon_heart" />
-                  </svg>
-                </button>
-              </div>
+                @if(Cart::instance("wishlist")->content()->count() > 0)
+                   <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist filled-heart"
+                    title="Add To Wishlist">
+                    <i class="fa-solid fa-heart"></i>
+                    </button>
+                @else
+                <form  method="post" action="{{route("add-wish-list")}}">
+                 @csrf
+                    <input name="id" type="hidden" value="{{$product->id}}">
+                    <input name="name" type="hidden" value="{{$product->name}}">
+                    <input name="price" type="hidden" value="{{$product->id == "" ? $product->regular_price : $product->sale_price}}">
+                    <input name="quantity" type="hidden" value="1">
+                    <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist"
+                    title="Add To Wishlist">
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <use href="#icon_heart" />
+                    </svg>
+                    </button>
+               </form>
+               @endif
+            </div>
             </div>
           </div>
           @endforeach
