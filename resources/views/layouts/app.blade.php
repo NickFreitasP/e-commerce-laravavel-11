@@ -21,6 +21,7 @@
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw=="
     crossorigin="anonymous" referrerpolicy="no-referrer">
+   <script src="https://kit.fontawesome.com/63e8bd2c61.js" crossorigin="anonymous"></script>
     @stack("styles")
 
 
@@ -488,11 +489,14 @@
                </a>
             </div>
           @endguest
-          <a href="wishlist.html" class="header-tools__item">
+          <a href="wishlist.html" class="header-tools__item header-tools__cart">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <use href="#icon_heart" />
             </svg>
-          </a>
+            @if(Cart::instance("wishlist")->count() > 0 )
+            <span class="cart-amount d-block position-absolute js-cart-items-count">{{ Cart::instance("wishlist")->content()->count()}}</span>
+            @endif
+         </a>
 
           <a href="{{route("cart")}}" class="header-tools__item header-tools__cart">
             <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"

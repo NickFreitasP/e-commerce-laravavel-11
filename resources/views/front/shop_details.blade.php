@@ -1,6 +1,12 @@
 @extends("layouts.app")
 @section("content")
-  <main class="pt-90">
+<style>
+ .filled-heart{
+    color: red;
+ }
+</style>
+
+<main class="pt-90">
     <div class="mb-md-1 pb-md-3"></div>
     <section class="product-single container">
       <div class="row">
@@ -125,11 +131,28 @@
           </form>
          @endif
           <div class="product-single__addtolinks">
-            <a href="#" class="menu-link menu-link_us-s add-to-wishlist"><svg width="16" height="16" viewBox="0 0 20 20"
+            @if(Cart::instance("wishlist")->content()->where("id",$product->id)->count() > 0 )
+
+             <a href="Javascript:void(0)" class="menu-link menu-link_us-s add-to-wishlist filled-heart"><svg width="16" height="16" viewBox="0 0 20 20"
                 fill="none" xmlns="http://www.w3.org/2000/svg">
                 <use href="#icon_heart" />
-              </svg><span>Add to Wishlist</span></a>
-            <share-button class="share-button">
+              </svg><span>Remove from wishlist</span></a>
+            @else
+              <form  method="post" action="{{route("add-wish-list")}}" id="form-add-wish-list">
+                 @csrf
+                    <input name="id" type="hidden" value="{{$product->id}}">
+                    <input name="name" type="hidden" value="{{$product->name}}">
+                    <input name="price" type="hidden" value="{{$product->id == "" ? $product->regular_price : $product->sale_price}}">
+                    <input name="quantity" type="hidden" value="1">
+
+                     <a href="javascript:void(0)" class="menu-link menu-link_us-s add-to-wishlist " onclick="document.getElementById('form-add-wish-list').submit();"><svg width="16" height="16" viewBox="0 0 20 20"
+                fill="none" xmlns="http://www.w3.org/2000/svg">
+                <use href="#icon_heart" />
+              </svg><span>  Add to wishlist</span></a>
+               </form>
+
+            @endif
+              <share-button class="share-button">
               <button class="menu-link menu-link_us-s to-share border-0 bg-transparent d-flex align-items-center">
                 <svg width="16" height="19" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <use href="#icon_sharing" />
