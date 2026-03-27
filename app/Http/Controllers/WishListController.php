@@ -12,7 +12,7 @@ class WishListController extends Controller
     $data = [
       "items" => $items
     ];
-
+    // dd($items);
     return view("front.wishlist",$data);
   }
 
@@ -22,4 +22,21 @@ class WishListController extends Controller
 
    }
 
+   public function removeWishlistItem($rowId){
+      Cart::instance("wishlist")->remove($rowId);
+      return redirect()->back();
+
+   }
+
+   public function emptyWishlist($rowId){
+     Cart::instance("wishlist")->destroy($rowId);
+     return redirect()->back();
+   }
+   public function moveToCart($rowId){
+    $item = Cart::instance("wishlist")->get($rowId);
+    Cart::instance("wishlist")->remove($rowId);
+    Cart::instance("cart")->add($item->id,$item->name,$item->qty,$item->price)->associate("App\Models\Product");
+    Return redirect()->back();
+
+   }
 }

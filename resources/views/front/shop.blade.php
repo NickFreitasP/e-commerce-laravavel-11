@@ -417,7 +417,7 @@
                   <span class="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span>
                 </div>
 
-                @if(Cart::instance("wishlist")->content()->count() > 0)
+                @if(Cart::instance("wishlist")->content()->where("id",$product->id)->count() > 0)
                    <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist filled-heart"
                     title="Add To Wishlist">
                     <i class="fa-solid fa-heart"></i>
