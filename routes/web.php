@@ -22,8 +22,16 @@ Route::controller(ShopController::class)->group(function(){
 });
 
 Route::controller(WishListController::class)->group(function(){
+
    Route::get("/wishlist","index")->name("wishlist");
+
    Route::post("/wishlist/add","addToWishList")->name("add-wish-list");
+
+   Route::delete("/wishlist/remove-item/{rowId}","removeWishlistItem")->name("wishlist-remove-item");
+
+   Route::delete("/wishlist/empty-wishlist","emptyWishlist")->name("wishlist-empty");
+
+   Route::post("/wishlist/move-to-cart/{rowId}","moveToCart")->name("wishlist-move-to-cart");
 
 
 
