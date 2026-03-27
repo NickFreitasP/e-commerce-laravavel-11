@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Categorie;
 use App\Models\Product;
 use App\Models\productImage;
-
+use App\Models\Coupon;
 use function PHPUnit\Framework\fileExists;
 
 class AdminController extends Controller
@@ -579,6 +579,22 @@ class AdminController extends Controller
 
         return redirect()->route("admin.product-images",["id"=>$product->id])->with("error","Não foi possível fazer upload da imagem.");
     }
+
+
+  // ===================================================== Coupons Routes ===================================================================
+
+
+
+    public function coupons(){
+        $coupons = Coupon::orderBy("expiry_date","DESC")->paginate(12);
+        $data = [
+            "coupons" => $coupons
+        ];
+        return view("back.admin.Coupons",$data);
+
+    }
+
+
 
 
 }
