@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\WishListController;
+use app\Http\Controllers\CouponController;
 
 Auth::routes();
 
@@ -36,6 +37,8 @@ Route::controller(WishListController::class)->group(function(){
 
 
 });
+
+
 
 
 Route::controller(CartController::class)->group(function(){
@@ -121,6 +124,23 @@ Route::middleware("auth",AdminMiddleware::class)->group(function(){
             Route::delete("/delete-product/{id}","deleteProduct")->name("admin.delete-product");
 
             Route::post("/add-product-principal-image/{id}","addProductPrincipalImage")->name("admin.add-product-principal-image");
+
+
+
+            // ===================================================== END  Product Routes ===================================================================
+
+
+
+            // ===================================================== Coupons Routes ===================================================================
+
+            Route::get("/coupons","coupons")->name("admin.coupons");
+
+
+
+
+
+
+
         });
 
 
