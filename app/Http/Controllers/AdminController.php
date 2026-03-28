@@ -593,8 +593,78 @@ class AdminController extends Controller
         return view("back.admin.Coupons",$data);
 
     }
+    public function addCoupon(){
+        return view("back.admin.add_coupon");
+    }
+
+    public function addCouponHandler(Request $request){
+
+       //Validate the input fileds
+       $request->validate([
+           "code" => "required",
+           "type" => "required",
+           "value" => "required|numeric",
+           "cart_value" => "required|numeric",
+           "expiry_date" => "required|date"
+       ]);
+
+       // Instantiate a new coupon and save data in the database
+       $coupoun = new Coupon();
+       $coupoun->code = $request->code;
+       $coupoun->type = $request->type;
+       $coupoun->value = $request->value;
+       $coupoun->cart_value = $request->cart_value;
+       $coupoun->expiry_date = $request->expiry_date;
+       $coupoun->save();
+
+       // Redirect to the coupon list
+       return redirect()->route("admin.coupons")->with("status", "Coupon add with success!");
 
 
+    }
+
+    public function editCoupon(int $id){
+
+     $coupon = Coupon::find($id);
+     $data = [
+      "coupon" => $coupon
+     ];
+
+     return view("back.admin.edit_coupon",$data);
+    }
+
+    public function editCouponHandler(Request $request){
+
+     $request->validate([
+         "code" => "required",
+         "type" => "required",
+         "value" => "required|numeric",
+         "cart_value" => "required|numeric",
+         "expiry_date" => "required|date"
+     ]);
+
+     $coupon = Coupon::find($request->id);
+     $coupon->code = $request->code;
+     $coupon->type = $request->type;
+     $coupon->value = $request->value;
+     $coupon->cart_value = $request->cart_value;
+     $coupon->expiry_date = $request->expiry_date;
+     $coupon->save();
+
+     return redirect()->route("admin.coupons")->with("status","Coupon update with success!");
+
+    }
+
+   public function deleteCoupon(Request $request){
+
+      $coupon = Coupon::find($request->coupon_id_delete);
+
+      $coupon->delete();
+
+      return redirect()->back()->with("status","Coupon deleted with success");
+
+
+   }
 
 
 }
