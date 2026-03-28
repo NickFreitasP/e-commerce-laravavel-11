@@ -135,9 +135,19 @@ Route::middleware("auth",AdminMiddleware::class)->group(function(){
 
             Route::get("/coupons","coupons")->name("admin.coupons");
 
+            Route::get("/add-coupon","addCoupon")->name("admin.coupons.add");
+
+            Route::post("/add-coupon-handler","addCouponHandler")->name("admin.coupons.add.handler");
+
+            // Edit coupon view
+            Route::get("/edit-coupon/{id}","editCoupon")->name("admin.coupons.edit");
+
+            // Edit coupon handler
+            Route::post("/edit-coupon-handler","editCouponHandler")->name("admin.coupons.edit.handler");
 
 
-
+            // Delete coupon
+            Route::delete("/delete-coupon","deleteCoupon")->name("admin.copouns.delete");
 
 
 
