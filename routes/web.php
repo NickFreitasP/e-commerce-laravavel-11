@@ -15,6 +15,7 @@ Auth::routes();
 // ROUTE HOME
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+
 Route::controller(ShopController::class)->group(function(){
 
     Route::get("/shop","shop")->name("shop");
@@ -38,9 +39,6 @@ Route::controller(WishListController::class)->group(function(){
 
 });
 
-
-
-
 Route::controller(CartController::class)->group(function(){
 
     Route::get("/cart","index")->name("cart");
@@ -54,6 +52,12 @@ Route::controller(CartController::class)->group(function(){
     Route::delete("delete-item-cart/{rowId}","deleteItemCart")->name("delete-item-cart");
 
     Route::delete("empty-cart","emptyCart")->name("empty-cart");
+
+    // Route apply and calculate coupon code
+    Route::post("/cart/apply-coupon-code","apllyCouponCode")->name("cart.apply.coupon.code");
+
+
+
 });
 
 // Login Route User/Admin routes
