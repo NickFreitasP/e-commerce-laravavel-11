@@ -56,6 +56,11 @@ Route::controller(CartController::class)->group(function(){
     // Route apply and calculate coupon code
     Route::post("/cart/apply-coupon-code","apllyCouponCode")->name("cart.apply.coupon.code");
 
+     // Route remove coupon from cart
+    Route::post("/cart/remove-coupon-cart","removeCouponCart")->name("cart.remove.coupon.cart");
+
+
+
 
 
 });
