@@ -112,7 +112,19 @@
                             </tbody>
                         </table>
                         <div class="cart-table-footer">
-                            <form action="{{ route('cart.apply.coupon.code') }}" class="position-relative bg-body"
+                            @if(Session::has("coupon"))
+                              <form action="{{ route('cart.remove.coupon.cart') }}" class="position-relative bg-body"
+                                method="post">
+                                @csrf
+                                @method('POST')
+                                <input class="form-control" type="text" name="coupon_code" placeholder="Coupon Code"
+                                    value="@if (Session::has('coupon')) {{ Session::get('coupon')['code'] }} Applied! @endif">
+
+                                <input class="btn-link fw-medium position-absolute top-0 end-0 h-100 px-4" type="submit"
+                                    value="Remove coupon">
+                            </form>
+                            @else
+                             <form action="{{ route('cart.apply.coupon.code') }}" class="position-relative bg-body"
                                 method="post">
                                 @csrf
                                 @method('POST')
@@ -122,6 +134,10 @@
                                 <input class="btn-link fw-medium position-absolute top-0 end-0 h-100 px-4" type="submit"
                                     value="APPLY COUPON">
                             </form>
+                            @endif
+
+
+
 
                             <form action="{{ route('empty-cart') }}" method="POST">
                                 @csrf
@@ -149,7 +165,7 @@
                                         @if (Session::has('discounts'))
                                             <tr>
                                                 <th>Subtotal</th>
-                                                <td>{{ Cart::instance('cart')->subtotal() }}</td>
+                                                <td>{{Cart::instance('cart')->subtotal()}}</td>
                                             </tr>
                                             <tr>
                                                 <th>{{Session::get("coupon")["code"]}}</th>
@@ -171,7 +187,7 @@
                                             </tr>
                                             <tr>
                                                 <th>Total</th>
-                                                <td>{{ Cart::instance('cart')->total() }}</td>
+                                                <td>{{ Session::get("discounts")["total"] }}</td>
                                             </tr>
                                         @else
                                             <tr>

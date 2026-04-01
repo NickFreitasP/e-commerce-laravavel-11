@@ -14,7 +14,8 @@ class CartController extends Controller
 
         $cart = Cart::instance("cart")->content();
         $data = ["items" => $cart];
-
+    //   dd(Session::get("discounts"),$cart);
+        // dd($cart);
         return view("front.cart",$data);
 
     }
@@ -22,6 +23,9 @@ class CartController extends Controller
     public function addItemCart(Request $request){
 
       Cart::instance("cart")->add($request->id,$request->name,$request->quantity,$request->price)->associate("App\Models\Product");
+      if(Session::has("discounts")){
+         $this->calculateDiscount();
+      }
 
 
       return redirect()->back();
@@ -34,6 +38,11 @@ class CartController extends Controller
      $product = Cart::instance("cart")->content()->get($rowId);
      $quantity = $product->qty + 1;
      Cart::instance("cart")->update($rowId,$quantity);
+
+     if(Session::has("discounts")){
+        $this->calculateDiscount();
+     }
+
      return redirect()->back();
     }
 
@@ -41,17 +50,30 @@ class CartController extends Controller
         $product = Cart::instance("cart")->content()->get($rowId);
         $quantity = $product->qty - 1;
         Cart::instance("cart")->update($rowId,$quantity);
+        if(Session::has("discounts")){
+          $this->calculateDiscount();
+        }
+
         return redirect()->back();
     }
 
     public function deleteItemCart($rowId){
         Cart::instance('cart')->remove($rowId);
+        if(Session::has("discounts")){
+            $this->calculateDiscount();
+        }
         return redirect()->back();
     }
 
     public function emptyCart(){
         Cart::instance("cart")->destroy();
+        if(Session::has("discounts")){
+            $this->removeCouponCart();
+        }
+
         return redirect()->back();
+
+
     }
 
 
@@ -96,18 +118,18 @@ class CartController extends Controller
 
        $discount = 0 ;
       if(Session::has("coupon")){
-
+       $subtotal =(float) str_replace(',', '', Cart::instance("cart")->subtotal()) ;
          if(Session::get("coupon")["type"] === "fixed"){
 
             $discount = Session::get("coupon")["value"];
 
          }else{
-             $discount = Cart::instance("cart")->subtotal() * Session::get("coupon")["value"]/100;
-         }
+            $discount =$subtotal * Session::get("coupon")["value"]/100;
+        }
 
-          $subTotalAfterDiscount = Cart::instance("cart")->subtotal - $discount;
+          $subTotalAfterDiscount = $subtotal  - $discount;
           $taxAfterDiscount = ($subTotalAfterDiscount * config("cart.tax"))/100;
-          $totalAfterDiscount = $subTotalAfterDiscount - $taxAfterDiscount;
+          $totalAfterDiscount = $subTotalAfterDiscount + $taxAfterDiscount;
 
           Session::put("discounts",[
                  "discount" => number_format(floatval($discount),2,".",""),
@@ -118,11 +140,18 @@ class CartController extends Controller
                  ]
           );
 
-
-
       }
 
     }
+
+   public function removeCouponCart(){
+
+     Session::forget("coupon");
+     Session::forget("discounts");
+     return redirect()->back()->with("success","Coupon has been removed");
+
+   }
+
 
 
 }
